@@ -10,7 +10,7 @@ void printChar(int c) {
 	//Loop while the TDR bit is not set
 	while(!(WrampSp1->Stat & 2));
 	
-	//Write the character to the Tx register
+	//Write the  character to the Tx register
 	WrampSp1->Tx = c;
 }
 

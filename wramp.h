@@ -94,7 +94,7 @@ typedef volatile struct
  **/
 typedef volatile struct
 {
-	int Iack;Switches
+	int Iack;
 } WrampUserInt_t;
 
 
