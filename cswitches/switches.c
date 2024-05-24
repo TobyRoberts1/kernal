@@ -25,7 +25,7 @@ void main() {
 	//Infinite loop
 	while(1) {
 		
-		//Read current value from parallel switch register
+		//Read current vaue from parallel switch register
 		switches = WrampParallel->Switches;
 		
 		//Print carriage return to SP1
