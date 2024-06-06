@@ -73,52 +73,59 @@ L.6:
 	jr	$ra
 .global	main
 main:
-	subui	$sp, $sp, 6
+	subui	$sp, $sp, 8
 	sw	$6, 1($sp)
 	sw	$7, 2($sp)
-	sw	$13, 3($sp)
-	sw	$ra, 4($sp)
-	addu	$6, $0, $0
-	addui	$13, $0, 16
-	sw	$13, 5($sp)
+	sw	$12, 3($sp)
+	sw	$13, 4($sp)
+	sw	$ra, 5($sp)
 	addu	$7, $0, $0
+	addui	$13, $0, 16
+	sw	$13, 7($sp)
+	addu	$6, $0, $0
 	j	L.9
 L.8:
 	lhi	$13, 0x7
 	ori	$13, $13, 0x3000
-	lw	$6, 0($13)
+	lw	$7, 0($13)
 	lhi	$13, 0x7
 	ori	$13, $13, 0x3001
+	sw	$13, 6($sp)
+	lw	$12, 0($13)
+	seq	$13, $12, $0
+	bnez	$13, L.11
+	lw	$13, 6($sp)
 	lw	$13, 0($13)
-	sle	$13, $13, $0
+	seq	$13, $13, $7
 	bnez	$13, L.11
 	lhi	$13, 0x7
 	ori	$13, $13, 0x3001
-	lw	$7, 0($13)
+	lw	$6, 0($13)
 L.11:
-	seqi	$13, $7, 1
+	seqi	$13, $6, 1
 	bnez	$13, L.15
-	seqi	$13, $7, 2
+	seqi	$13, $6, 2
 	bnez	$13, L.16
-	seqi	$13, $7, 4
+	seqi	$13, $6, 4
 	bnez	$13, L.7
 	j	L.14
 L.15:
-	sw	$6, 0($sp)
+	sw	$7, 0($sp)
 	jal	displaydeci
 	j	L.14
 L.16:
-	sw	$6, 0($sp)
+	sw	$7, 0($sp)
 	jal	displayhexi
 L.14:
 L.9:
 	j	L.8
-	sw	$6, 0($sp)
+	sw	$7, 0($sp)
 	jal	displaydeci
 L.7:
 	lw	$6, 1($sp)
 	lw	$7, 2($sp)
-	lw	$13, 3($sp)
-	lw	$ra, 4($sp)
-	addui	$sp, $sp, 6
+	lw	$12, 3($sp)
+	lw	$13, 4($sp)
+	lw	$ra, 5($sp)
+	addui	$sp, $sp, 8
 	jr	$ra
