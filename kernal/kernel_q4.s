@@ -86,14 +86,14 @@ handle_IRQ2:
     # Acknowledge the interrupt
     sw $0, 0x72003($0)
 
-    lw $7, time_slice($0)
-    subui $7, $7, 1
-    sw $7, time_slice($0)
-    beqz $7, dispatcher
+    lw $13, time_slice($0)
+    subui $13, $13, 1
+    sw $13, time_slice($0)
+    beqz $13, dispatcher
 
-    lw $7, counter($0) 
-    addi $7, $7, 1
-    sw $7, counter($0)
+    lw $13, counter($0) 
+    addi $13, $13, 1
+    sw $13, counter($0)
 
     
 

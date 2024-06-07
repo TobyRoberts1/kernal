@@ -144,6 +144,8 @@ save_context:
     sw $10, pcb_reg10($13)
     sw $11, pcb_reg11($13)
     sw $12, pcb_reg12($13)
+    sw $sp, pcb_sp($13)
+    sw $ra, pcb_ra($13)
 
 
 
@@ -192,6 +194,8 @@ load_context:
     lw $10, pcb_reg10($13)
     lw $11, pcb_reg11($13)
     lw $12, pcb_reg12($13)
+    lw $sp, pcb_sp($13)
+    lw $ra, pcb_ra($13)
 
     # Return to the new task
     rfe
