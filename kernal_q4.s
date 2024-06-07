@@ -15,10 +15,10 @@
 .equ pcb_reg11, 11
 .equ pcb_reg12, 12
 .equ pcb_reg13, 13
-.equ pcb_regsp, sp
-.equ pcb_regra, ra
-.equ pcb_regear, ear
-.equ pcb_regccrtl, ccrtl
+.equ pcb_sp, 14
+.equ pcb_ear, 15
+.equ pcb_cctrl, 16
+#needs the sw 
 main:
    
 
@@ -33,11 +33,12 @@ main:
     sw $2, pcb_link($1)
     # Setup the stack pointer
     la $2, task1_stack
-    sw $2, pcb_sp($1)
+    sw $2, pcb_sp($1)    #top of the tasks stack 
     # Setup the $ear field
-    la $2, serial_main
-    sw $2, pcb_ear($1)
-    # Setup the $cctrl field
+    la $2, serial_main       
+    sw $2, pcb_ear($1)      #where it goes after an exception. 
+
+    # Setup the $cctrl field        #needs IRQ2 timer and IE global. enabled
     sw $5, pcb_cctrl($1)
 
     
@@ -88,32 +89,51 @@ handler:
 
 handle_IRQ2:
 #IQR2 Timer interrupt
-    
+    # Acknowledge the interrupt
+    sw $0, 0x72003($0)
+
+    lw $7, time_slice($0)
+    subui $7, $7, 1
+    sw $7, time_slice($0)
+    beqz $7, dispatcher
+
     lw $7, counter($0) 
     addi $7, $7, 1
     sw $7, counter($0)
 
-    # Acknowledge the interrupt
-    sw $0, 0x72003($0)
+    
 
     #return to the main program
     rfe
 
     
-ispatcher:
+dispatcher:
     save_context:
         # Get the base address of the current PCB
         lw $13, current_task($0)
         # Save the registers
         sw $1, pcb_reg1($13)
         sw $2, pcb_reg2($13)
-        …
+        sw $3, pcb_reg3($13)
+        sw $4, pcb_reg4($13)
+        sw $5, pcb_reg5($13)
+        sw $6, pcb_reg6($13)
+        sw $7, pcb_reg7($13)
+        sw $8, pcb_reg8($13)
+        sw $9, pcb_reg9($13)
+        sw $10, pcb_reg10($13)
+        sw $11, pcb_reg11($13)
+        sw $12, pcb_reg12($13)
+        sw $sp, pcb_sp($13)
+        #sw $ra, pcb_regra($13)
+
+
         # $1 is saved now so we can use it
         # Get the old value of $13
         movsg $1, $ers
         # and save it to the pcb
         sw $1, pcb_reg13($13)
-        …
+      
         # Save $ear
         movsg $1, $ear
         sw $1, pcb_ear($13)
@@ -121,13 +141,63 @@ ispatcher:
         movsg $1, $cctrl
         sw $1, pcb_cctrl($13)
 
+    schedule:
+    lw $13, current_task($0) #Get current task
+    lw $13, pcb_link($13) #Get next task from pcb_link field
+    sw $13, current_task($0) #Set next task as current task
+
+    addi $7, $0, 2
+    sw $7, time_slice($0)
+
+    load_context:
+        lw $13, current_task($0) #Get PCB of current task
+        # Get the PCB value for $13 back into $ers
+        lw $1, pcb_reg13($13)
+        movgs $ers, $1
+        # Restore $ear
+        lw $1, pcb_ear($13)
+        movgs $ear, $1
+        # Restore $cctrl
+        lw $1, pcb_cctrl($13)
+        movgs $cctrl, $1
+        # Restore the other registers
+        lw $1, pcb_reg1($13)
+        lw $2, pcb_reg2($13)
+        lw $3, pcb_reg3($13)
+        lw $4, pcb_reg4($13)
+        lw $5, pcb_reg5($13)
+        lw $6, pcb_reg6($13)
+        lw $7, pcb_reg7($13)
+        lw $8, pcb_reg8($13)
+        lw $9, pcb_reg9($13)
+        lw $10, pcb_reg10($13)
+        lw $11, pcb_reg11($13)
+        lw $12, pcb_reg12($13)
+        lw $sp, pcb_sp($13)
+        #lw $ra, pcb_regra($13)
+
+
+        # Return to the new task
+        rfe
+
+
+
 
 
 .data
+time_slice:
+    .word 2
 
 .bss
+
+current_task:
+    .word
+
 old_vector:
     .word
 
+    .space 200
+task1_stack:
+
 task1_pcb:
-.space 200
+    .space 18
