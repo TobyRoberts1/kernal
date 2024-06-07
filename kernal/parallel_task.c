@@ -29,7 +29,7 @@ void displaydeci(int switches){
     return; 
 }
 
-void main(){
+void parallel_main(){
     // Variables decalered 
     int switches = 0;
     int base = 16; 
