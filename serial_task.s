@@ -17,6 +17,7 @@ mainLoop:
 
 
     lw $11, 0x71001($0)             #store the read value from serial port 
+    beqz $11, one
     
     #check what the input is  then jump to the correct place. 
     seqi $3, $11, 0x31      #sets $3 to 1 if $11 is = to 1
@@ -30,13 +31,6 @@ mainLoop:
 
     j mainLoop
 
-
-
-# no_input: 
-
-#     j main
-
-    
 
 
 
@@ -113,19 +107,19 @@ two:
     addi $11, $0, '\r'
     sw $11, 0x71000($0)
 
+    divi $5, $9, 6000   #converts to min
+
     #write first time value in minute
     jal polling 
-    divi $8, $9, 10000    #divide by 100000
-    divi $8, $8, 10
+    divi $8, $5, 10      #divide by 10 to get the 10s minute
     remi $8, $8, 10
     addi $8, $8, 48  #add 48 to get ascii value 
     sw $8, 0x71000($0)
 
     #write second time value in minute
-    jal polling 
-    divi $8, $9, 10000    #divide by 10000
-    remi $8, $8, 10
-    addi $8, $8, 48  #add 48 to get ascii value 
+    jal polling  
+    remi $8, $5, 10
+    addi $8, $8, 48         #add 48 to get ascii value 
     sw $8, 0x71000($0)
 
     #write : is 72 as ascii
@@ -133,17 +127,19 @@ two:
     addi $8, $0, 0x3A
     sw $8, 0x71000($0)
 
+
+    remi $5, $9, 6000 #converts to seconds 
+
     #write 3rd time value as a second
     jal polling 
-    divi $8, $9, 1000   #divide by 1000
-    remi $8, $8, 10
+    divi $8, $5, 1000  #divide by 10
     addi $8, $8, 48  #add 48 to get ascii value 
     sw $8, 0x71000($0)
 
     #write 4th time value as a second
     jal polling 
-    divi $8, $9, 100   #divide by 100
-    remi $8, $8, 10
+    remi $8, $5, 100
+    divi $8, $8, 10  #divide by 10
     addi $8, $8, 48  #add 48 to get ascii value 
     sw $8, 0x71000($0)
 
