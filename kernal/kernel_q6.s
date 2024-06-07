@@ -68,7 +68,7 @@ main:
     la $1, task2_pcb
     sw $1, current_task($0)
     # Setup the link field
-    la $2, task1_pcb
+    la $2, task3_pcb
     sw $2, pcb_link($1)
     # Setup the stack pointer
     la $2, task2_stack
@@ -80,10 +80,27 @@ main:
     # Setup the $cctrl field        #needs IRQ2 timer and IE global. enabled
     sw $5, pcb_cctrl($1)
 
+
+    # Setup the pcb for task 3
+    la $1, task3_pcb
+    sw $1, current_task($0)
+    # Setup the link field
+    la $2, task1_pcb
+    sw $2, pcb_link($1)
+    # Setup the stack pointer
+    la $2, task3_stack
+    sw $2, pcb_sp($1)    #top of the tasks stack 
+    # Setup the $ear field
+    la $2, breakout_main      
+    sw $2, pcb_ear($1)      #where it goes after an exception. 
+
+    # Setup the $cctrl field        #needs IRQ2 timer and IE global. enabled
+    sw $5, pcb_cctrl($1)
+
+
+
+
     #set serial to be the current task 
-    
-
-
 
 
 
@@ -167,7 +184,7 @@ lw $13, current_task($0) #Get current task
 lw $13, pcb_link($13) #Get next task from pcb_link field
 sw $13, current_task($0) #Set next task as current task
 
-addi $7, $0, 100
+addi $7, $0, 2
 sw $7, time_slice($0)
 
 load_context:
@@ -206,7 +223,7 @@ load_context:
 
 .data
 time_slice:
-    .word 100
+    .word 2
 
 .bss
 
@@ -222,11 +239,15 @@ task1_stack:
     .space 200
 task2_stack:
 
-
+    .space 200
+task3_stack:
 
 
 task1_pcb:
     .space 18
 
 task2_pcb:
+    .space 18
+
+task3_pcb:
     .space 18

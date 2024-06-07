@@ -6,7 +6,7 @@
 
 #GAMES=	gameSelect.O breakout.O rocks.O
 #GAMES=	breakout.O
-#GAMES=	rocks.O
+#-GAMES=	rocks.O
 
 #======	Uncomment lines as you answer more questions,
 #		or just leave them all uncommented if you don't mind errors.
