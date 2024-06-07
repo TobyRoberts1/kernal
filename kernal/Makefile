@@ -4,9 +4,9 @@
 #====== Uncomment exactly one of these lines depending
 #		on which games you want to link.
 
-#GAMES=	gameSelect.O breakout.O rocks.O
+# GAMES=	gameSelect.O breakout.O rocks.O
 #GAMES=	breakout.O
-#-GAMES=	rocks.O
+GAMES=	rocks.O
 
 #======	Uncomment lines as you answer more questions,
 #		or just leave them all uncommented if you don't mind errors.
@@ -16,7 +16,7 @@ QUESTIONS_DONE=	parallel_task.srec \
 				kernel_q3.srec \
 				kernel_q4.srec \
 				kernel_q5.srec \
-#				kernel_q6.srec \
+				kernel_q6.srec \
 #				kernel_q7.srec \
 #				kernel_q8.srec \
 #				kernel_q9.srec

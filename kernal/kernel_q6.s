@@ -91,8 +91,8 @@ main:
     la $2, task3_stack
     sw $2, pcb_sp($1)    #top of the tasks stack 
     # Setup the $ear field
-    la $2, breakout_main      
-    sw $2, pcb_ear($1)      #where it goes after an exception. 
+    la $2, rocks_main    
+    sw $2, pcb_ear($1)      #where it goes after an exception.  
 
     # Setup the $cctrl field        #needs IRQ2 timer and IE global. enabled
     sw $5, pcb_cctrl($1)
