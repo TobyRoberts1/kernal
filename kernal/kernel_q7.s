@@ -66,7 +66,7 @@ main:
 
     # Setup the pcb for task 2
     la $1, task2_pcb
-    sw $1, current_task($0)
+    #sw $1, current_task($0)
     # Setup the link field
     la $2, task3_pcb
     sw $2, pcb_link($1)
@@ -81,9 +81,9 @@ main:
     sw $5, pcb_cctrl($1)
 
 
-    # Setup the pcb for task 3
+    # Setup the pcb for task 3  
     la $1, task3_pcb
-    sw $1, current_task($0)
+    #sw $1, current_task($0)
     # Setup the link field
     la $2, task1_pcb
     sw $2, pcb_link($1)
@@ -128,16 +128,15 @@ handle_IRQ2:
     # Acknowledge the interrupt
     sw $0, 0x72003($0)
 
-    lw $7, time_slice($0)
-    subui $7, $7, 1
-    sw $7, time_slice($0)
-    beqz $7, dispatcher
-
     lw $7, counter($0) 
     addi $7, $7, 1
     sw $7, counter($0)
 
-    
+handle_time_slice:  
+    lw $7, time_slice($0)
+    subui $7, $7, 1
+    sw $7, time_slice($0)
+    beqz $7, dispatcher
 
     #return to the main program
     rfe
@@ -180,12 +179,30 @@ save_context:
     sw $1, pcb_cctrl($13)
 
 schedule:
-lw $13, current_task($0) #Get current task
-lw $13, pcb_link($13) #Get next task from pcb_link field
-sw $13, current_task($0) #Set next task as current task
 
-addi $7, $0, 2
-sw $7, time_slice($0)
+    subui $sp,$sp,1     #create stack to store 3
+    sw $3,0($sp)
+
+    lw $13, current_task($0) #Get current task
+    lw $13, pcb_link($13) #Get next task from pcb_link field
+    sw $13, current_task($0) #Set next task as current task
+
+    
+
+    #check if it is the game running, if it is break so it can be priotrized. 
+    la $3, task3_pcb
+    sequ $13, $13, $3
+    bnez $13, playing_game 
+    
+    lw $3, 0($sp)           #restore $3 
+    addui $sp, $sp, 1    #delete stack 
+
+
+    addui $13, $0, 1            #sets time sice to 1 if it is not the game. 
+    sw $13,time_slice($0)
+
+
+
 
 load_context:
     lw $13, current_task($0) #Get PCB of current task
@@ -217,13 +234,17 @@ load_context:
     # Return to the new task
     rfe
 
+playing_game:           
+    addi $13, $0, 4        #sets teh time slice to 4 only when playing the game
+    sw $13, time_slice($0)
 
+    j load_context          #jumps back to loading context
 
 
 
 .data
 time_slice:
-    .word 2
+    .word 1
 
 .bss
 
